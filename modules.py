@@ -15,8 +15,6 @@ import concurrent.futures
 from openai import OpenAI
 
 
-st.session_state.client = OpenAI(api_key = st.secrets['api'])
-
 
 @st.cache_resource
 def load():
@@ -29,6 +27,8 @@ def load():
 
     
 def extractor(caso_clinico):
+    
+    cliente = OpenAI(api_key = st.secrets['api'])
     
     prompt = '''
     CONDICIONES
@@ -53,7 +53,7 @@ def extractor(caso_clinico):
             Recuerda contestar con un JSON con la clave 'original_symptoms' y 'symptoms_english':"""}
     ]
     
-    response = st.session_state.client.chat.completions.create(
+    response = cliente.chat.completions.create(
        model ="gpt-3.5-turbo-1106",
         messages=messages,
         response_format={"type": "json_object"},
@@ -82,6 +82,7 @@ def search_database(query):
     
 
 def selector(respuesta_database, sintoma):
+    cliente = OpenAI(api_key = st.secrets['api'])
 
     prompt = """
     CONDICIONES
@@ -106,7 +107,7 @@ def selector(respuesta_database, sintoma):
             ¡Recuerda SOLO contestar con el FORMATO de JSON en python, nada más! Recuerda contestar la columna "Name" en el idioma original del síntoma proporcionado:"""}
     ]
     
-    response = st.session_state.client.chat.completions.create(
+    response = cliente.chat.completions.create(
         model="gpt-3.5-turbo-1106",
         messages=messages,
         response_format={"type": "json_object"},
