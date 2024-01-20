@@ -15,13 +15,6 @@ import concurrent.futures
 from openai import OpenAI
 
 
-if 'client' not in st.session_state:
-    st.session_state.client = OpenAI(st.secrets['api'])
-
-if 'model' not in st.session_state:
-    st.session_state['model'] = SentenceTransformer(st.secrets['model'])
-
-
 def extractor(caso_clinico):
     
     prompt = '''
