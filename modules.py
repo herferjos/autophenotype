@@ -109,6 +109,7 @@ def jsoner(respuesta, instrucciones):
     intentos = 0
     while intentos < max_intentos:
         try:
+            print(respuesta)
             match = re.search(r'\{([^}]+)\}', respuesta)
             contenido_json = match.group(0)
             diccionario = json.loads(contenido_json)
