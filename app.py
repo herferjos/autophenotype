@@ -14,8 +14,7 @@ if 'texts_database' not in st.session_state:
     with open('texts.pkl', 'rb') as f:
         st.session_state['texts_database'] = pickle.load(f)
 
-if 'model' not in st.session_state:
-    st.session_state['model'] = SentenceTransformer(st.secrets['model'])
+load_model()
 
 if 'client' not in st.session_state:
     st.session_state.client = OpenAI(api_key = st.secrets['api'])
