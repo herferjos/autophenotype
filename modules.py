@@ -17,7 +17,7 @@ from openai import OpenAI
 
 @st.cache_resource
 def load_model():
-    st.session_state.model = SentenceTransformer(st.secrets['model'])
+    return SentenceTransformer(st.secrets['model'])
     
 def extractor(caso_clinico):
     
@@ -45,7 +45,7 @@ def extractor(caso_clinico):
     ]
     
     response = st.session_state.client.chat.completions.create(
-        model="gpt-3.5-turbo-1106",
+        ="gpt-3.5-turbo-1106",
         messages=messages,
         response_format={"type": "json_object"},
     )
@@ -55,7 +55,10 @@ def extractor(caso_clinico):
 
 def search_database(query):
     k = 20
-    query_vector = st.session_state.model.encode(query)
+
+    modelo = load_model()
+    
+    query_vector = modelo.encode(query)
 
     # Buscar los vectores más similares al vector de consulta usando faiss como antes
     distances, indices = st.session_state.index_database.search(np.array([query_vector]), k)
