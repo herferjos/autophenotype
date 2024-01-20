@@ -4,6 +4,7 @@ import faiss
 import pickle
 from hugchat import hugchat
 from hugchat.login import Login
+from modules import orchest
 
 
 if 'index_database' not in st.session_state:
