@@ -4,7 +4,8 @@ import faiss
 import pickle
 from openai import OpenAI
 from modules import *
-    
+
+st.set_page_config(page_title="Síntomas", page_icon="😷", layout="wide")
 
 st.markdown("<h2 style='text-align: center;'>¡Buscador de Fenotipos Humanos!</h2>", unsafe_allow_html=True)
 st.write("### 1) Introduce los síntomas que deseas buscar")
