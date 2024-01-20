@@ -15,6 +15,9 @@ import concurrent.futures
 from openai import OpenAI
 
 
+st.session_state.client = OpenAI(api_key = st.secrets['api'])
+
+
 @st.cache_resource
 def load():
     modelo = SentenceTransformer(st.secrets['model'])
