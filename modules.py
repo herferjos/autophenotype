@@ -16,8 +16,14 @@ from openai import OpenAI
 
 
 @st.cache_resource
-def load_model():
-    return SentenceTransformer(st.secrets['model'])
+def load():
+    modelo = SentenceTransformer(st.secrets['model'])
+    index_database = faiss.read_index("index.faiss")
+    with open('texts.pkl', 'rb') as f:
+        texts_database = pickle.load(f)
+        
+    return modelo, index_database, texts_database
+
     
 def extractor(caso_clinico):
     
@@ -56,17 +62,17 @@ def extractor(caso_clinico):
 def search_database(query):
     k = 20
 
-    modelo = load_model()
+    modelo, index_database, texts_database = load()
     
     query_vector = modelo.encode(query)
 
     # Buscar los vectores más similares al vector de consulta usando faiss como antes
-    distances, indices = st.session_state.index_database.search(np.array([query_vector]), k)
+    distances, indices = index_database.search(np.array([query_vector]), k)
 
     # Obtener los ID y Texts correspondientes a los vectores encontrados con mayor similaridad al texto de input usando ids_texts como antes
     results = []
     for i in range(k):
-        result = {"ID": st.session_state.texts_database[indices[0][i]]["id"], "Text": st.session_state.texts_database[indices[0][i]]["text"]}
+        result = {"ID": texts_database[indices[0][i]]["id"], "Text": texts_database[indices[0][i]]["text"]}
         results.append(result)
 
     return results
