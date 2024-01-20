@@ -23,6 +23,8 @@ if 'chatbot' not in st.session_state:
     cookies = sign.login()
     st.session_state['chatbot'] = hugchat.ChatBot(cookies=cookies.get_dict())
 
+st.write(st.session_state.model)
+
 st.markdown("<h2 style='text-align: center;'>¡Buscador de Fenotipos Humanos!</h2>", unsafe_allow_html=True)
 st.write("### 1) Introduce los síntomas que deseas buscar")
 descripcion = st.text_area(label=":blue[Descripción clínica]", placeholder="Escribe aquí...")
