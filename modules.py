@@ -106,8 +106,7 @@ def jsoner(respuesta, instrucciones):
     intentos = 0
     while intentos < max_intentos:
         try:
-            respuesta_ok = respuesta.strip().replace(r'\_', '_'). replace('`', '')
-            match = re.search(r'\{([^}]+)\}', respuesta_ok)
+            match = re.search(r'\{([^}]+)\}', respuesta)
             contenido_json = match.group(0)
             diccionario = json.loads(contenido_json)
             return diccionario
