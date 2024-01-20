@@ -3,7 +3,7 @@ from sentence_transformers import SentenceTransformer
 import faiss
 import pickle
 from openai import OpenAI
-from modules import orchest
+from modules import *
 
 
 if 'index_database' not in st.session_state:
