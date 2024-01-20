@@ -9,7 +9,6 @@ import pandas as pd
 import json
 import os
 import glob
-import tabulate
 import time
 import shutil
 import re
