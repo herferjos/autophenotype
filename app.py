@@ -4,9 +4,6 @@ import faiss
 import pickle
 from openai import OpenAI
 from modules import *
-
-
-st.session_state.client = OpenAI(api_key = st.secrets['api'])
     
 
 st.markdown("<h2 style='text-align: center;'>¡Buscador de Fenotipos Humanos!</h2>", unsafe_allow_html=True)
