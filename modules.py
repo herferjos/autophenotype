@@ -2,7 +2,6 @@ import streamlit as st
 from sentence_transformers import SentenceTransformer
 import faiss
 import pickle
-from hugchat import hugchat
 import numpy as np
 import requests
 import pandas as pd
@@ -13,53 +12,51 @@ import time
 import shutil
 import re
 import concurrent.futures
+from openai import OpenAI
+
+
+if 'client' not in st.session_state:
+    st.session_state.client = OpenAI(st.secrets['api'])
 
 if 'model' not in st.session_state:
     st.session_state['model'] = SentenceTransformer(st.secrets['model'])
-
-def chatbot(prompt):
-    max_intentos = 3
-    intentos = 0
-    while intentos < max_intentos:
-        try:
-            id = st.session_state.chatbot.new_conversation()
-            st.session_state.chatbot.change_conversation(id)
-            respuesta = st.session_state.chatbot.query(prompt)['text']
-            return respuesta
-        except StopIteration:
-            # Manejo del error StopIteration
-            intentos += 1
-            if intentos < max_intentos:
-                # Espera unos segundos antes de intentar de nuevo
-                time.sleep(2)
-            else:
-                st.error("Se alcanzó el máximo número de intentos. No se pudo obtener una respuesta válida.")
-                return None
 
 
 def extractor(caso_clinico):
 
     prompt = f"""Esta es la descripción clínica proporcionada por el usuario: '{caso_clinico}'
     """
-
-    prompt = prompt + '''
+    
+    prompt = '''
     CONDICIONES
-
+    
     Usted es un asistente médico para ayudar a extraer síntomas y fenotipos de un caso clínico.
     Sea preciso y no alucine con la información.
-
+    
     MISIÓN
-
+    
     Generar un diccionario en python que recoja los síntomas clínicos mencionados.
-
+    
     FORMATO RESPUESTA:
-
+    
     python dictionary -> {"original_symptoms": [], "symptoms_english":[]}
-
+    
     ¡Recuerda extraer los síntomas médicos de la descripcion clínica proporcionada anteriormente y SOLO contestar con el diccionario en python para lo síntomas, nada más! Ten en cuenta que la descripción clínica puede estar en varios idiomas pero tu debes siempre responder con un listado en inglés y en el idioma original
     '''
     
-    return chatbot(prompt)
+    messages = [
+          {"role":"system", "content": prompt},
+          {"role":"user", "content": f"""Esta es la descripción clínica proporcionada por el usuario: '{caso_clinico}'
+            Recuerda contestar con un JSON con la clave 'original_symptoms' y 'symptoms_english':"""}
+    ]
+    
+    response = st.session_state.client.chat.completions.create(
+        model="gpt-3.5-turbo-1106",
+        messages=messages,
+        response_format={"type": "json_object"},
+    )
+
+    return json.loads(response.choices[0].message.content)
 
 
 def search_database(query):
@@ -95,49 +92,30 @@ def selector(respuesta_database, sintoma):
     {"ID": ..., "Name": ...}
 
     """
+    
+    messages = [
+          {"role":"system", "content": prompt},
+          {"role":"user", "content": f"""Esta es la descripción del síntoma proporcionada: '{sintoma}'
+            Esta son las posibilidades que he encontrado: {respuesta_database}
+            ¡Recuerda SOLO contestar con el FORMATO de JSON en python, nada más! Recuerda contestar la columna "Name" en el idioma original del síntoma proporcionado:"""}
+    ]
+    
+    response = st.session_state.client.chat.completions.create(
+        model="gpt-3.5-turbo-1106",
+        messages=messages,
+        response_format={"type": "json_object"},
+    )
 
-    prompt = prompt + f"""Esta es la descripción del síntoma proporcionada: '{sintoma}'
-
-    Esta son las posibilidades que he encontrado: {respuesta_database}
-    ¡Recuerda SOLO contestar con el FORMATO de JSON en python, nada más! Recuerda contestar la columna "Name" en el idioma original del síntoma proporcionado.
-    """
-    return chatbot(prompt)
+    return json.loads(response.choices[0].message.content)
     
 
-def jsoner(respuesta, instrucciones):
-    max_intentos=3
-    intentos = 0
-    while intentos < max_intentos:
-        try:
-            print(respuesta)
-            match = re.search(r'\{([^}]+)\}', respuesta)
-            contenido_json = match.group(0)
-            diccionario = json.loads(contenido_json)
-            return diccionario
-        except json.JSONDecodeError:
-            if intentos < max_intentos - 1:
-                prompt = """Responde únicamente con un diccionario json de python con la siguiente estructura:
-                """
-                prompt = prompt + f"""
-                Instrucciones del JSON:
-                {instrucciones}
-                Respuesta mal formateada: {respuesta}"""
-                respuesta = st.session_state.chatbot.query(prompt)['text']
-            else:
-                print("Se alcanzó el máximo número de intentos. La respuesta no se pudo convertir a JSON.")
-                return None
-        intentos += 1
-
-
 def orchest(description):
-    respuesta = extractor(description)
-    diccionario = jsoner(respuesta, '{"original_symptoms": [], "symptoms_english":[]}')
+    diccionario = extractor(description)
     lista_sintomas_english = diccionario['symptoms_english']
     lista_sintomas_original = diccionario['original_symptoms']
 
     def process_sintoma(sintoma_en, sintoma_original):
-        respuesta2 = selector(search_database(sintoma_en), sintoma_original)
-        diccionario_sintoma = jsoner(respuesta2, '{"ID": ..., "Name": ...}')
+        diccionario_sintoma = selector(search_database(sintoma_en), sintoma_original)
         codigo_sintoma = diccionario_sintoma["ID"]
         nombre_sintoma = diccionario_sintoma["Name"]
         return sintoma_original.capitalize(), codigo_sintoma, nombre_sintoma
