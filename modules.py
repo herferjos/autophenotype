@@ -14,6 +14,9 @@ import shutil
 import re
 import concurrent.futures
 
+if 'model' not in st.session_state:
+    st.session_state['model'] = SentenceTransformer(st.secrets['model'])
+
 def chatbot(prompt):
     max_intentos = 3
     intentos = 0
