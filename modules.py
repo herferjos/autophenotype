@@ -45,7 +45,7 @@ def extractor(caso_clinico):
     ]
     
     response = st.session_state.client.chat.completions.create(
-        ="gpt-3.5-turbo-1106",
+       model ="gpt-3.5-turbo-1106",
         messages=messages,
         response_format={"type": "json_object"},
     )
