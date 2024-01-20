@@ -12,6 +12,7 @@ import glob
 import time
 import shutil
 import re
+import concurrent.futures
 
 def chatbot(prompt):
     max_intentos = 3
