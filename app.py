@@ -2,8 +2,7 @@ import streamlit as st
 from sentence_transformers import SentenceTransformer
 import faiss
 import pickle
-from hugchat import hugchat
-from hugchat.login import Login
+from openai import OpenAI
 from modules import orchest
 
 
@@ -18,10 +17,8 @@ if 'texts_database' not in st.session_state:
 if 'model' not in st.session_state:
     st.session_state['model'] = SentenceTransformer(st.secrets['model'])
 
-if 'chatbot' not in st.session_state:
-    sign = Login(st.secrets['email'], st.secrets['password'])
-    cookies = sign.login()
-    st.session_state['chatbot'] = hugchat.ChatBot(cookies=cookies.get_dict())
+if 'client' not in st.session_state:
+    st.session_state.client = OpenAI(st.secrets['api'])
 
 
 st.markdown("<h2 style='text-align: center;'>¡Buscador de Fenotipos Humanos!</h2>", unsafe_allow_html=True)
