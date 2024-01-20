@@ -18,8 +18,8 @@ if 'model' not in st.session_state:
     st.session_state['model'] = SentenceTransformer(st.secrets['model'])
 
 if 'client' not in st.session_state:
-    st.session_state.client = OpenAI(st.secrets['api'])
-
+    st.session_state.client = OpenAI(api_key = st.secrets['api'])
+    
 
 st.markdown("<h2 style='text-align: center;'>¡Buscador de Fenotipos Humanos!</h2>", unsafe_allow_html=True)
 st.write("### 1) Introduce los síntomas que deseas buscar")
