@@ -23,9 +23,6 @@ if 'model' not in st.session_state:
 
 
 def extractor(caso_clinico):
-
-    prompt = f"""Esta es la descripción clínica proporcionada por el usuario: '{caso_clinico}'
-    """
     
     prompt = '''
     CONDICIONES
