@@ -6,15 +6,6 @@ from openai import OpenAI
 from modules import *
 
 
-if 'index_database' not in st.session_state:
-    # reconstruir_faiss()
-    st.session_state['index_database'] = faiss.read_index("index.faiss")
-
-if 'texts_database' not in st.session_state:
-    with open('texts.pkl', 'rb') as f:
-        st.session_state['texts_database'] = pickle.load(f)
-
-
 if 'client' not in st.session_state:
     st.session_state.client = OpenAI(api_key = st.secrets['api'])
     
