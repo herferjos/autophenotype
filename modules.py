@@ -125,7 +125,7 @@ def orchest(description):
         diccionario_sintoma = selector(search_database(sintoma_en), sintoma_original)
         codigo_sintoma = diccionario_sintoma["ID"]
         nombre_sintoma = diccionario_sintoma["Name"]
-        return sintoma_original.capitalize(), codigo_sintoma, nombre_sintoma
+        return codigo_sintoma, nombre_sintoma
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         resultados = list(executor.map(lambda args: process_sintoma(*args), zip(lista_sintomas_english, lista_sintomas_original)))
