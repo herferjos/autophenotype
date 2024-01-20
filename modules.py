@@ -14,8 +14,10 @@ import re
 import concurrent.futures
 from openai import OpenAI
 
-if 'model' not in st.session_state:
-    st.session_state['model'] = SentenceTransformer(st.secrets['model'])
+
+@st.cache_resource
+def load_model():
+    st.session_state.model = SentenceTransformer(st.secrets['model'])
     
 def extractor(caso_clinico):
     
