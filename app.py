@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from autophenotype import get_phenotypes
 
@@ -11,6 +12,10 @@ st.write("### 1) Enter the symptoms you want to search for")
 description = st.text_area(
     label=":blue[Clinical Description]", placeholder="Write here..."
 )
+
+openai_api_key = st.text_input("Enter your OpenAI API (optional):", type="password")
+if openai_api_key:
+    os.environ["OPENAI_API_KEY"] = openai_api_key
 
 if st.button(label="Extract Symptoms", type="primary"):
     st.session_state["description"] = description
