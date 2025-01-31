@@ -1,5 +1,5 @@
 from openai import OpenAI
-from src.autophenotype.prompts import (
+from autophenotype.prompts import (
     EXTRACTOR_SYSTEM,
     EXTRACTOR_USER,
     SELECTOR_SYSTEM,
@@ -17,7 +17,7 @@ openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def chat(messages):
 
     return openai_client.chat.completions.create(
-        model="gpt-3.5-turbo-1106",
+        model="gpt-4o-mini",
         messages=messages,
         response_format={"type": "json_object"},
     )
